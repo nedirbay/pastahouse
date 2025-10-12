@@ -100,6 +100,29 @@ const addToCart = () => {
   ElMessage.success(`${product.value.name} added to cart!`)
 }
 
+// Buy Now function
+const buyNow = () => {
+  if (!userStore.isAuthenticated) {
+    ElMessage.warning('Please login to purchase items')
+    router.push('/auth/login')
+    return
+  }
+
+  // Add to cart first
+  userStore.addToCart({
+    productId: product.value.id,
+    name: product.value.name,
+    description: product.value.description,
+    price: product.value.price,
+    image: product.value.image,
+    quantity: quantity.value,
+    maxQuantity: product.value.quantity,
+  })
+
+  // Then navigate to cart
+  router.push('/cart')
+}
+
 // Submit review function
 const submitReview = () => {
   if (!userStore.isAuthenticated) {
@@ -217,7 +240,7 @@ const formatDate = (dateString: string) => {
                 {{ product.inStock ? 'Add to Cart' : 'Out of Stock' }}
               </ElButton>
 
-              <ElButton type="warning" plain size="large"> Buy Now </ElButton>
+              <ElButton type="warning" plain size="large" @click="buyNow"> Buy Now </ElButton>
             </div>
 
             <div class="product-guarantees">
@@ -475,6 +498,7 @@ const formatDate = (dateString: string) => {
   font-weight: bold;
   margin-bottom: 10px;
   font-size: 1.1rem;
+  color: #333;
 }
 
 .quantity-controls {

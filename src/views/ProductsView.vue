@@ -1,10 +1,22 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { ElRow, ElCol, ElCard, ElButton, ElIcon, ElCheckbox, ElSlider, ElInput } from 'element-plus'
+import {
+  ElRow,
+  ElCol,
+  ElCard,
+  ElButton,
+  ElIcon,
+  ElCheckbox,
+  ElSlider,
+  ElInput,
+  ElMessage,
+} from 'element-plus'
 import { Star, ShoppingBag, Search } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
 
 const router = useRouter()
+const userStore = useUserStore()
 
 // Product data
 interface Product {
@@ -208,6 +220,27 @@ const goToProductDetail = (productId: number) => {
   router.push(`/product/${productId}`)
 }
 
+// Add to cart function
+const addToCart = (product: Product) => {
+  if (!userStore.isAuthenticated) {
+    ElMessage.warning('Please login to add items to cart')
+    router.push('/auth/login')
+    return
+  }
+
+  userStore.addToCart({
+    productId: product.id,
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    image: product.image,
+    quantity: 1,
+    maxQuantity: 10, // Assuming a default max quantity
+  })
+
+  ElMessage.success(`${product.name} added to cart!`)
+}
+
 // Initialize with all products
 applyFilters()
 </script>
@@ -341,7 +374,7 @@ applyFilters()
                       <span>{{ product.rating }}</span>
                     </div>
                   </div>
-                  <ElButton type="primary" class="add-to-cart-btn" @click.stop>
+                  <ElButton type="primary" class="add-to-cart-btn" @click.stop="addToCart(product)">
                     <ElIcon><ShoppingBag /></ElIcon>
                     Add to Cart
                   </ElButton>
@@ -404,24 +437,10 @@ applyFilters()
   border-bottom: 1px solid #eee;
 }
 
-.filter-section {
-  margin-bottom: 25px;
-}
-
 .filter-section h3 {
   font-size: 1.2rem;
   color: #333;
   margin-bottom: 15px;
-}
-
-.checkbox-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.checkbox-item :deep(.el-checkbox) {
-  width: 100%;
 }
 
 .price-range {
@@ -431,20 +450,15 @@ applyFilters()
   font-weight: 500;
 }
 
-.rating-filter {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-
-.rating-filter :deep(.el-button) {
-  min-width: 40px;
-}
-
 .filter-actions {
   margin-top: 30px;
   padding-top: 20px;
   border-top: 1px solid #eee;
+}
+
+.results-info {
+  color: #666;
+  font-size: 1.1rem;
 }
 
 /* Products Grid */
@@ -457,11 +471,6 @@ applyFilters()
   justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
-}
-
-.results-info {
-  color: #666;
-  font-size: 1.1rem;
 }
 
 .products-list {
@@ -540,12 +549,6 @@ applyFilters()
   font-size: 1.5rem;
   font-weight: bold;
   color: #ff6b6b;
-}
-
-.product-rating {
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
 
 .product-rating span {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import {
   ElRow,
   ElCol,
@@ -36,7 +36,13 @@ const calculateTotals = () => {
 }
 
 // Watch for cart changes and recalculate totals
-calculateTotals()
+watch(
+  cartItems,
+  () => {
+    calculateTotals()
+  },
+  { deep: true, immediate: true },
+)
 
 // Update item quantity
 const updateQuantity = (itemId: number, quantity: number) => {
@@ -192,11 +198,12 @@ const proceedToCheckout = () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #1a1a1a; /* Dark background */
 }
 
 .page-title {
   font-size: 2.5rem;
-  color: #333;
+  color: #fff; /* White text */
   margin-bottom: 30px;
   text-align: center;
 }
@@ -204,132 +211,93 @@ const proceedToCheckout = () => {
 /* Empty Cart */
 .empty-cart-card {
   border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Darker shadow */
   text-align: center;
-}
-
-.empty-cart-content {
-  padding: 50px 20px;
-}
-
-.empty-cart-icon {
-  font-size: 4rem;
-  color: #ddd;
-  margin-bottom: 20px;
+  background-color: #222; /* Dark card background */
 }
 
 .empty-cart-content h3 {
   font-size: 1.8rem;
   margin-bottom: 15px;
-  color: #333;
+  color: #fff; /* White text */
 }
 
 .empty-cart-content p {
-  color: #666;
+  color: #ccc; /* Lighter text */
   margin-bottom: 30px;
   font-size: 1.1rem;
 }
 
+.empty-cart-icon {
+  font-size: 4rem;
+  color: #666; /* Darker icon */
+  margin-bottom: 20px;
+}
+
 /* Cart Content */
-.cart-items-col {
-  padding-right: 15px;
-}
-
-.cart-summary-col {
-  padding-left: 15px;
-}
-
 .cart-items-card {
   border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Darker shadow */
   margin-bottom: 30px;
+  background-color: #222; /* Dark card background */
 }
 
 .cart-header h2 {
   margin-bottom: 20px;
-  color: #333;
+  color: #fff; /* White text */
 }
 
 .cart-item {
   display: flex;
   align-items: center;
   padding: 20px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.cart-item:last-child {
-  border-bottom: none;
-}
-
-.item-image {
-  width: 120px;
-  height: 90px;
-  margin-right: 20px;
-}
-
-.item-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.item-details {
-  flex: 1;
-  margin-right: 20px;
+  border-bottom: 1px solid #444; /* Darker border */
 }
 
 .item-name {
   font-size: 1.2rem;
   margin-bottom: 5px;
-  color: #333;
+  color: #fff; /* White text */
 }
 
 .item-description {
-  color: #666;
+  color: #ccc; /* Lighter text */
   margin-bottom: 10px;
   font-size: 0.9rem;
 }
 
 .item-price {
   font-weight: bold;
-  color: #ff6b6b;
+  color: #ff9999; /* Lighter price color */
   font-size: 1.1rem;
-}
-
-.item-quantity {
-  margin-right: 20px;
 }
 
 .item-total {
   font-weight: bold;
   font-size: 1.2rem;
-  color: #333;
+  color: #fff; /* White text */
   min-width: 80px;
   text-align: center;
-}
-
-.item-actions {
-  margin-left: 20px;
 }
 
 .cart-actions {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #444; /* Darker border */
 }
 
 /* Cart Summary */
 .cart-summary-card {
   border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Darker shadow */
   position: sticky;
   top: 20px;
+  background-color: #222; /* Dark card background */
 }
 
 .cart-summary-card h2 {
   margin-bottom: 20px;
-  color: #333;
+  color: #fff; /* White text */
 }
 
 .summary-details {
@@ -341,6 +309,7 @@ const proceedToCheckout = () => {
   justify-content: space-between;
   margin-bottom: 15px;
   font-size: 1.1rem;
+  color: #fff; /* White text */
 }
 
 .summary-row span:last-child {
@@ -354,12 +323,12 @@ const proceedToCheckout = () => {
 }
 
 .total-amount {
-  color: #ff6b6b;
+  color: #ff9999; /* Lighter total amount color */
 }
 
 .checkout-btn {
   width: 100%;
-  background: linear-gradient(135deg, #ff6b6b 0%, #ffa502 100%);
+  background: linear-gradient(135deg, #b33b3b 0%, #b37a02 100%); /* Darker gradient */
   border: none;
   color: white;
   font-weight: 500;
@@ -370,34 +339,8 @@ const proceedToCheckout = () => {
 
 .payment-methods p {
   text-align: center;
-  color: #666;
+  color: #ccc; /* Lighter text */
   margin-bottom: 15px;
   font-size: 0.9rem;
-}
-
-.payment-icons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-.payment-icon {
-  font-size: 1.5rem;
-}
-
-@media (max-width: 992px) {
-  .cart-items-col,
-  .cart-summary-col {
-    width: 100%;
-    padding: 0;
-  }
-
-  .cart-content .el-row {
-    flex-direction: column;
-  }
-
-  .cart-summary-col {
-    margin-top: 30px;
-  }
 }
 </style>

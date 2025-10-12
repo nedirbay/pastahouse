@@ -106,7 +106,7 @@ const goToProducts = () => {
       <h2 class="section-title">Featured Pasta Creations</h2>
       <p class="section-subtitle">Our most popular handmade pasta dishes</p>
 
-      <el-carousel :interval="4000" type="card" height="350px" class="products-carousel">
+      <el-carousel :interval="4000" type="card" height="550px" class="products-carousel">
         <el-carousel-item v-for="pasta in featuredPasta" :key="pasta.id" class="carousel-item">
           <el-card class="product-card" @click="goToProductDetail(pasta.id)">
             <img
@@ -166,11 +166,23 @@ const goToProducts = () => {
 </template>
 
 <style scoped>
+/* Hide scrollbars */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+* {
+  scrollbar-width: none;
+}
+
 .home-container {
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
+  width: 95%;
+  max-width: 95%;
   padding: 0;
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* Hero Section */
@@ -180,7 +192,7 @@ const goToProducts = () => {
   text-align: center;
   margin-bottom: 50px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  width: 100%;
+  width: 100vw;
 }
 
 .hero-title {
@@ -326,16 +338,6 @@ const goToProducts = () => {
   text-align: center;
   width: 100%;
   padding: 0 20px;
-}
-
-.benefits-grid {
-  margin-top: 30px;
-  width: 100%;
-}
-
-.benefit-col {
-  display: flex;
-  justify-content: center;
 }
 
 .benefit-card {

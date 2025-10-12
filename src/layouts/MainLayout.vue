@@ -43,39 +43,32 @@ const cartItemCount = ref(6)
     </el-main>
 
     <el-footer class="app-footer">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h3>PastaHouse</h3>
-          <p>Bringing homemade pasta love to your table since 2023.</p>
-        </div>
-        <div class="footer-section">
-          <h4>Quick Links</h4>
-          <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Menu</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact</a></li>
-          </ul>
-        </div>
-        <div class="footer-section">
-          <h4>Contact Us</h4>
-          <p>Email: info@pastahouse.com</p>
-          <p>Phone: (123) 456-7890</p>
-        </div>
-      </div>
       <div class="footer-bottom">
-        <p>&copy; 2025 PastaHouse. All rights reserved.</p>
+        <p>&copy; 2025 Router. All rights reserved.</p>
       </div>
     </el-footer>
   </el-container>
 </template>
 
 <style scoped>
+/* Hide scrollbars */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+* {
+  scrollbar-width: none;
+}
+
 .app-container {
   min-height: 100vh;
   width: 100%;
   margin: 0;
   padding: 0;
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .app-header {
@@ -186,45 +179,6 @@ const cartItemCount = ref(6)
   margin: 0;
 }
 
-.footer-content {
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  padding: 40px 30px;
-}
-
-.footer-section h3,
-.footer-section h4 {
-  margin-bottom: 20px;
-}
-
-.footer-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.footer-section ul li {
-  margin-bottom: 10px;
-}
-
-.footer-section a {
-  color: #ccc;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.footer-section a:hover {
-  color: white;
-}
-
-.footer-section p {
-  color: #ccc;
-  margin-bottom: 10px;
-}
-
 .footer-bottom {
   border-top: 1px solid #555;
   text-align: center;
@@ -254,12 +208,6 @@ const cartItemCount = ref(6)
 
   .header-actions {
     gap: 10px;
-  }
-
-  .footer-content {
-    flex-direction: column;
-    gap: 30px;
-    padding: 30px 20px;
   }
 
   .footer-bottom {
