@@ -2,8 +2,11 @@
 import { ref } from 'vue'
 import { ElCarousel, ElCarouselItem, ElRow, ElCol, ElCard, ElButton, ElIcon } from 'element-plus'
 import { Dish, ShoppingBag, Star, Clock, Van } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 
-// Featured pasta products with local images
+const router = useRouter()
+
+// Featured pasta products
 const featuredPasta = ref([
   {
     id: 1,
@@ -70,6 +73,16 @@ const handleImageError = (event: Event) => {
     target.src = 'https://placehold.co/300x180/ff6b6b/ffffff?text=Fresh+Pasta'
   }
 }
+
+// Navigate to product detail
+const goToProductDetail = (productId: number) => {
+  router.push(`/product/${productId}`)
+}
+
+// Go to products page
+const goToProducts = () => {
+  router.push('/products')
+}
 </script>
 
 <template>
@@ -80,8 +93,10 @@ const handleImageError = (event: Event) => {
         <h1 class="hero-title">Authentic Homemade Pasta</h1>
         <p class="hero-subtitle">Crafted with passion, delivered with care</p>
         <div class="hero-buttons">
-          <el-button type="primary" size="large" :icon="ShoppingBag"> Shop Now </el-button>
-          <el-button type="warning" size="large" plain> View Menu </el-button>
+          <el-button type="primary" size="large" :icon="ShoppingBag" @click="goToProducts">
+            Shop Now
+          </el-button>
+          <el-button type="warning" size="large" plain @click="goToProducts"> View Menu </el-button>
         </div>
       </div>
     </section>
@@ -91,9 +106,9 @@ const handleImageError = (event: Event) => {
       <h2 class="section-title">Featured Pasta Creations</h2>
       <p class="section-subtitle">Our most popular handmade pasta dishes</p>
 
-      <el-carousel :interval="4000" type="card" height="550px" class="products-carousel">
+      <el-carousel :interval="4000" type="card" height="350px" class="products-carousel">
         <el-carousel-item v-for="pasta in featuredPasta" :key="pasta.id" class="carousel-item">
-          <el-card class="product-card">
+          <el-card class="product-card" @click="goToProductDetail(pasta.id)">
             <img
               :src="pasta.image"
               :alt="pasta.name"
@@ -110,7 +125,9 @@ const handleImageError = (event: Event) => {
                   <span>{{ pasta.rating }}</span>
                 </div>
               </div>
-              <el-button type="primary" class="add-to-cart-btn"> Add to Cart </el-button>
+              <el-button type="primary" class="add-to-cart-btn" @click.stop>
+                Add to Cart
+              </el-button>
             </div>
           </el-card>
         </el-carousel-item>
@@ -140,7 +157,9 @@ const handleImageError = (event: Event) => {
       <div class="cta-content">
         <h2 class="cta-title">Ready to Taste the Difference?</h2>
         <p class="cta-subtitle">Order now and get 10% off your first purchase</p>
-        <el-button type="warning" size="large" :icon="ShoppingBag"> Order Now </el-button>
+        <el-button type="warning" size="large" :icon="ShoppingBag" @click="goToProducts">
+          Order Now
+        </el-button>
       </div>
     </section>
   </div>
@@ -148,8 +167,10 @@ const handleImageError = (event: Event) => {
 
 <style scoped>
 .home-container {
-  width: 95%;
-  max-width: 99%;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
 }
 
 /* Hero Section */
@@ -159,7 +180,7 @@ const handleImageError = (event: Event) => {
   text-align: center;
   margin-bottom: 50px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  width: 100vw;
+  width: 100%;
 }
 
 .hero-title {
@@ -239,6 +260,12 @@ const handleImageError = (event: Event) => {
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .product-image {

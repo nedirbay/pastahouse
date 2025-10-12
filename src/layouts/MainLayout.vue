@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { ElHeader, ElMain, ElFooter, ElContainer } from 'element-plus'
+
+// Cart item count (in a real app, this would come from a store)
+const cartItemCount = ref(6)
 </script>
 
 <template>
@@ -8,12 +12,12 @@ import { ElHeader, ElMain, ElFooter, ElContainer } from 'element-plus'
     <el-header class="app-header">
       <div class="header-content">
         <div class="logo">
-          <a href="/">PastaHouse</a>
+          <h1>PastaHouse</h1>
         </div>
         <nav class="main-nav">
           <RouterLink to="/" class="nav-link">Home</RouterLink>
+          <RouterLink to="/products" class="nav-link">Products</RouterLink>
           <RouterLink to="/about" class="nav-link">About</RouterLink>
-          <a href="#" class="nav-link">Menu</a>
           <a href="#" class="nav-link">Contact</a>
         </nav>
         <div class="header-actions">
@@ -23,10 +27,10 @@ import { ElHeader, ElMain, ElFooter, ElContainer } from 'element-plus'
           <button class="action-btn">
             <i class="fas fa-user"></i>
           </button>
-          <button class="action-btn cart-btn">
+          <RouterLink to="/cart" class="action-btn cart-btn">
             <i class="fas fa-shopping-cart"></i>
-            <span class="cart-count">0</span>
-          </button>
+            <span v-if="cartItemCount > 0" class="cart-count">{{ cartItemCount }}</span>
+          </RouterLink>
         </div>
       </div>
     </el-header>
@@ -36,6 +40,26 @@ import { ElHeader, ElMain, ElFooter, ElContainer } from 'element-plus'
     </el-main>
 
     <el-footer class="app-footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>PastaHouse</h3>
+          <p>Bringing homemade pasta love to your table since 2023.</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Menu</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Contact Us</h4>
+          <p>Email: info@pastahouse.com</p>
+          <p>Phone: (123) 456-7890</p>
+        </div>
+      </div>
       <div class="footer-bottom">
         <p>&copy; 2025 PastaHouse. All rights reserved.</p>
       </div>
@@ -53,12 +77,10 @@ import { ElHeader, ElMain, ElFooter, ElContainer } from 'element-plus'
 
 .app-header {
   background: linear-gradient(135deg, #ff6b6b 0%, #ffa502 100%);
-  padding: 40px;
+  padding: 0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   width: 100%;
   margin: 0;
-  display: flex;
-  align-items: center;
 }
 
 .header-content {
@@ -68,17 +90,16 @@ import { ElHeader, ElMain, ElFooter, ElContainer } from 'element-plus'
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 25px 30px;
+  padding: 15px 30px;
 }
 
-.logo a {
+.logo h1 {
   color: white;
   font-size: 1.8rem;
   font-weight: 700;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   margin: 0;
   padding: 0;
-  text-decoration: none;
 }
 
 .main-nav {
@@ -121,6 +142,7 @@ import { ElHeader, ElMain, ElFooter, ElContainer } from 'element-plus'
   transition: background 0.3s ease;
   margin: 0;
   padding: 0;
+  position: relative;
 }
 
 .action-btn:hover {
@@ -156,12 +178,9 @@ import { ElHeader, ElMain, ElFooter, ElContainer } from 'element-plus'
 .app-footer {
   background: #333;
   color: white;
-  padding: 25px 0;
+  padding: 0;
   width: 100%;
   margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .footer-content {
