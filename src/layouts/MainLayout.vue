@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { ElHeader, ElMain, ElFooter, ElContainer } from 'element-plus'
+import { useUserStore } from '@/stores/userStore'
+
+const userStore = useUserStore()
 
 // Cart item count (in a real app, this would come from a store)
 const cartItemCount = ref(6)
@@ -18,7 +21,7 @@ const cartItemCount = ref(6)
           <RouterLink to="/" class="nav-link">Home</RouterLink>
           <RouterLink to="/products" class="nav-link">Products</RouterLink>
           <RouterLink to="/about" class="nav-link">About</RouterLink>
-          <a href="#" class="nav-link">Contact</a>
+          <RouterLink to="/contact" class="nav-link">Contact</RouterLink>
         </nav>
         <div class="header-actions">
           <button class="action-btn">

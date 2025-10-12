@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElCard, ElForm, ElFormItem, ElInput, ElButton, ElIcon } from 'element-plus'
+import { ElCard, ElForm, ElFormItem, ElInput, ElButton, ElIcon, ElMessage } from 'element-plus'
 import { User, Lock, Message, ArrowRight } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
+
+const userStore = useUserStore()
+const router = useRouter()
 
 const registerForm = ref({
   name: '',
@@ -10,9 +15,50 @@ const registerForm = ref({
   confirmPassword: '',
 })
 
-const handleRegister = () => {
-  console.log('Register attempt:', registerForm.value)
-  // Here you would normally send the registration request to your backend
+const loading = ref(false)
+
+const handleRegister = async () => {
+  if (
+    !registerForm.value.name ||
+    !registerForm.value.email ||
+    !registerForm.value.password ||
+    !registerForm.value.confirmPassword
+  ) {
+    ElMessage.error('Please fill in all fields')
+    return
+  }
+
+  if (registerForm.value.password !== registerForm.value.confirmPassword) {
+    ElMessage.error('Passwords do not match')
+    return
+  }
+
+  if (registerForm.value.password.length < 6) {
+    ElMessage.error('Password must be at least 6 characters')
+    return
+  }
+
+  loading.value = true
+
+  try {
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // For demo purposes, we'll accept any valid input
+    // In a real app, you would validate with a backend API
+    userStore.register({
+      id: Date.now(),
+      name: registerForm.value.name,
+      email: registerForm.value.email,
+    })
+
+    ElMessage.success('Registration successful!')
+    router.push('/')
+  } catch (error) {
+    ElMessage.error('Registration failed. Please try again.')
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -65,7 +111,13 @@ const handleRegister = () => {
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" size="large" class="register-button" @click="handleRegister">
+          <el-button
+            type="primary"
+            size="large"
+            class="register-button"
+            @click="handleRegister"
+            :loading="loading"
+          >
             Create Account
             <el-icon class="register-icon"><ArrowRight /></el-icon>
           </el-button>
@@ -73,7 +125,7 @@ const handleRegister = () => {
       </el-form>
 
       <div class="login-link">
-        <p>Already have an account? <RouterLink to="/login">Sign in</RouterLink></p>
+        <p>Already have an account? <RouterLink to="/auth/login">Sign in</RouterLink></p>
       </div>
     </el-card>
   </div>

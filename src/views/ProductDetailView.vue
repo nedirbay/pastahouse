@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import {
   ElRow,
   ElCol,
@@ -10,12 +10,17 @@ import {
   ElInput,
   ElAvatar,
   ElDivider,
+  ElMessage,
 } from 'element-plus'
 import { Star, ShoppingBag, User, Clock, ChatLineRound } from '@element-plus/icons-vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
+
+const userStore = useUserStore()
+const router = useRouter()
+const route = useRoute()
 
 // Get product ID from route
-const route = useRoute()
 const productId = ref(route.params.id || 1)
 
 // Product data
@@ -41,18 +46,8 @@ const reviewForm = reactive({
   email: '',
 })
 
-// Review interface
-interface Review {
-  id: number
-  name: string
-  rating: number
-  comment: string
-  date: string
-  avatar: string
-}
-
 // Sample reviews
-const reviews = ref<Review[]>([
+const reviews = ref([
   {
     id: 1,
     name: 'Maria Rossi',
@@ -86,17 +81,36 @@ const quantity = ref(1)
 
 // Add to cart function
 const addToCart = () => {
-  console.log(`Added ${quantity.value} ${product.value.name} to cart`)
-  // Here you would normally dispatch an action to add the product to cart
-  // For now, we'll just show an alert
-  alert(`${product.value.name} added to cart!`)
+  if (!userStore.isAuthenticated) {
+    ElMessage.warning('Please login to add items to cart')
+    router.push('/auth/login')
+    return
+  }
+
+  userStore.addToCart({
+    productId: product.value.id,
+    name: product.value.name,
+    description: product.value.description,
+    price: product.value.price,
+    image: product.value.image,
+    quantity: quantity.value,
+    maxQuantity: product.value.quantity,
+  })
+
+  ElMessage.success(`${product.value.name} added to cart!`)
 }
 
 // Submit review function
 const submitReview = () => {
+  if (!userStore.isAuthenticated) {
+    ElMessage.warning('Please login to leave a review')
+    router.push('/auth/login')
+    return
+  }
+
   if (reviewForm.rating > 0 && reviewForm.comment && reviewForm.name && reviewForm.email) {
     const today = new Date().toISOString().split('T')[0]
-    const newReview: Review = {
+    const newReview = {
       id: reviews.value.length + 1,
       name: reviewForm.name,
       rating: reviewForm.rating,
@@ -113,7 +127,9 @@ const submitReview = () => {
     reviewForm.name = ''
     reviewForm.email = ''
 
-    console.log('Review submitted:', newReview)
+    ElMessage.success('Review submitted successfully!')
+  } else {
+    ElMessage.error('Please fill in all required fields')
   }
 }
 
@@ -248,7 +264,13 @@ const formatDate = (dateString: string) => {
           <!-- Review Form -->
           <div class="review-form-section">
             <h3>Write a Review</h3>
-            <div class="review-form">
+            <div v-if="!userStore.isAuthenticated" class="login-prompt">
+              <p>
+                Please <RouterLink to="/auth/login">login</RouterLink> or
+                <RouterLink to="/auth/register">register</RouterLink> to leave a review
+              </p>
+            </div>
+            <div v-else class="review-form">
               <div class="form-group">
                 <label>Your Rating</label>
                 <ElRate v-model="reviewForm.rating" :max="5" />
@@ -268,29 +290,29 @@ const formatDate = (dateString: string) => {
                 <ElCol :span="12">
                   <div class="form-group">
                     <label>Name</label>
-                    <ElInput v-model="reviewForm.name" placeholder="Your name" />
+                    <ElInput
+                      v-model="reviewForm.name"
+                      placeholder="Your name"
+                      :value="userStore.user.name || ''"
+                      disabled
+                    />
                   </div>
                 </ElCol>
                 <ElCol :span="12">
                   <div class="form-group">
                     <label>Email</label>
-                    <ElInput v-model="reviewForm.email" type="email" placeholder="Your email" />
+                    <ElInput
+                      v-model="reviewForm.email"
+                      type="email"
+                      placeholder="Your email"
+                      :value="userStore.user.email || ''"
+                      disabled
+                    />
                   </div>
                 </ElCol>
               </ElRow>
 
-              <ElButton
-                type="primary"
-                @click="submitReview"
-                :disabled="
-                  reviewForm.rating === 0 ||
-                  !reviewForm.comment ||
-                  !reviewForm.name ||
-                  !reviewForm.email
-                "
-              >
-                Submit Review
-              </ElButton>
+              <ElButton type="primary" @click="submitReview"> Submit Review </ElButton>
             </div>
           </div>
 
@@ -550,6 +572,29 @@ const formatDate = (dateString: string) => {
   font-size: 1.4rem;
   margin-bottom: 20px;
   color: #333;
+}
+
+.login-prompt {
+  text-align: center;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.login-prompt p {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.login-prompt a {
+  color: #ff6b6b;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.login-prompt a:hover {
+  text-decoration: underline;
 }
 
 .form-group {

@@ -1,7 +1,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElCard, ElForm, ElFormItem, ElInput, ElButton, ElCheckbox, ElIcon } from 'element-plus'
+import {
+  ElCard,
+  ElForm,
+  ElFormItem,
+  ElInput,
+  ElButton,
+  ElCheckbox,
+  ElIcon,
+  ElMessage,
+} from 'element-plus'
 import { User, Lock, ArrowRight } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
+
+const userStore = useUserStore()
+const router = useRouter()
 
 const loginForm = ref({
   username: '',
@@ -9,9 +23,35 @@ const loginForm = ref({
   rememberMe: false,
 })
 
-const handleLogin = () => {
-  console.log('Login attempt:', loginForm.value)
-  // Here you would normally send the login request to your backend
+const loading = ref(false)
+
+const handleLogin = async () => {
+  if (!loginForm.value.username || !loginForm.value.password) {
+    ElMessage.error('Please fill in all fields')
+    return
+  }
+
+  loading.value = true
+
+  try {
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // For demo purposes, we'll accept any non-empty username/password
+    // In a real app, you would validate with a backend API
+    userStore.login({
+      id: Date.now(),
+      name: loginForm.value.username,
+      email: `${loginForm.value.username}@example.com`,
+    })
+
+    ElMessage.success('Login successful!')
+    router.push('/')
+  } catch (error) {
+    ElMessage.error('Login failed. Please check your credentials.')
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -49,7 +89,13 @@ const handleLogin = () => {
         </div>
 
         <el-form-item>
-          <el-button type="primary" size="large" class="login-button" @click="handleLogin">
+          <el-button
+            type="primary"
+            size="large"
+            class="login-button"
+            @click="handleLogin"
+            :loading="loading"
+          >
             Sign In
             <el-icon class="login-icon"><ArrowRight /></el-icon>
           </el-button>
@@ -57,7 +103,7 @@ const handleLogin = () => {
       </el-form>
 
       <div class="signup-link">
-        <p>Don't have an account? <RouterLink to="/register">Sign up</RouterLink></p>
+        <p>Don't have an account? <RouterLink to="/auth/register">Sign up</RouterLink></p>
       </div>
     </el-card>
   </div>

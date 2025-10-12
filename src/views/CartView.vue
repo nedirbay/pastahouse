@@ -1,44 +1,24 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { ElRow, ElCol, ElCard, ElButton, ElIcon, ElInputNumber, ElDivider } from 'element-plus'
+import { ref, reactive, computed } from 'vue'
+import {
+  ElRow,
+  ElCol,
+  ElCard,
+  ElButton,
+  ElIcon,
+  ElInputNumber,
+  ElDivider,
+  ElMessage,
+} from 'element-plus'
 import { Delete, ShoppingBag, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
 
+const userStore = useUserStore()
 const router = useRouter()
 
-// Cart items data
-const cartItems = ref([
-  {
-    id: 1,
-    productId: 1,
-    name: 'Fresh Fettuccine',
-    description: 'Handmade flat ribbon pasta, perfect with creamy sauces',
-    price: 12.99,
-    image: 'https://images.unsplash.com/photo-1515516484336-59005480b4d6?w=200&h=150&fit=crop',
-    quantity: 2,
-    maxQuantity: 10,
-  },
-  {
-    id: 2,
-    productId: 3,
-    name: 'Homemade Pappardelle',
-    description: 'Wide egg pasta ribbons, ideal for rich meat sauces',
-    price: 14.99,
-    image: 'https://images.unsplash.com/photo-1616089080075-0f507671b1a4?w=200&h=150&fit=crop',
-    quantity: 1,
-    maxQuantity: 5,
-  },
-  {
-    id: 3,
-    productId: 6,
-    name: 'Mushroom Ravioli',
-    description: 'Ravioli filled with wild mushrooms and herbs',
-    price: 16.99,
-    image: 'https://images.unsplash.com/photo-1608496776497-46b4b1c1f5e3?w=200&h=150&fit=crop',
-    quantity: 3,
-    maxQuantity: 8,
-  },
-])
+// Cart items from store
+const cartItems = computed(() => userStore.cartItems)
 
 // Cart summary
 const cartSummary = reactive({
@@ -55,21 +35,18 @@ const calculateTotals = () => {
   cartSummary.total = cartSummary.subtotal + cartSummary.shipping + cartSummary.tax
 }
 
-// Initialize totals
+// Watch for cart changes and recalculate totals
 calculateTotals()
 
 // Update item quantity
 const updateQuantity = (itemId: number, quantity: number) => {
-  const item = cartItems.value.find((item) => item.id === itemId)
-  if (item) {
-    item.quantity = quantity
-    calculateTotals()
-  }
+  userStore.updateCartItemQuantity(itemId, quantity)
+  calculateTotals()
 }
 
 // Remove item from cart
 const removeItem = (itemId: number) => {
-  cartItems.value = cartItems.value.filter((item) => item.id !== itemId)
+  userStore.removeFromCart(itemId)
   calculateTotals()
 }
 
@@ -80,8 +57,18 @@ const continueShopping = () => {
 
 // Proceed to checkout
 const proceedToCheckout = () => {
-  alert('Proceeding to checkout!')
-  // Here you would normally redirect to checkout page
+  if (!userStore.isAuthenticated) {
+    ElMessage.warning('Please login to proceed to checkout')
+    router.push('/auth/login')
+    return
+  }
+
+  if (cartItems.value.length === 0) {
+    ElMessage.error('Your cart is empty')
+    return
+  }
+
+  router.push('/order')
 }
 </script>
 
