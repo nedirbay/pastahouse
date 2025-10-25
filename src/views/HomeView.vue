@@ -10,32 +10,32 @@ const router = useRouter()
 const featuredPasta = ref([
   {
     id: 1,
-    name: 'Fresh Fettuccine',
-    description: 'Handmade flat ribbon pasta, perfect with creamy sauces',
+    name: 'Taze Fettuccine',
+    description: 'El yapımı düz şerit makarna, krema soslarla mükemmel',
     price: 12.99,
     image: 'https://images.unsplash.com/photo-1515516484336-59005480b4d6?w=400&h=300&fit=crop',
     rating: 4.9,
   },
   {
     id: 2,
-    name: 'Artisanal Ravioli',
-    description: 'Delicate pasta pockets filled with ricotta and spinach',
+    name: 'Zanaatkar Ravioli',
+    description: 'Ricotta ve ıspanakla doldurulmuş hassas makarna poşetleri',
     price: 15.99,
     image: 'https://images.unsplash.com/photo-1608496776497-46b4b1c1f5e3?w=400&h=300&fit=crop',
     rating: 4.8,
   },
   {
     id: 3,
-    name: 'Homemade Pappardelle',
-    description: 'Wide egg pasta ribbons, ideal for rich meat sauces',
+    name: 'Ev Yapımı Pappardelle',
+    description: 'Geniş yumurta makarna şeritleri, zengin et sosları için ideal',
     price: 14.99,
     image: 'https://images.unsplash.com/photo-1616089080075-0f507671b1a4?w=400&h=300&fit=crop',
     rating: 4.7,
   },
   {
     id: 4,
-    name: 'Traditional Tagliatelle',
-    description: 'Classic cut pasta, excellent with bolognese sauce',
+    name: 'Geleneksel Tagliatelle',
+    description: 'Klasik kesim makarna, bolognese sosla mükemmel',
     price: 13.99,
     image: 'https://images.unsplash.com/photo-1585951636944-300a6dae8644?w=400&h=300&fit=crop',
     rating: 4.9,
@@ -46,23 +46,23 @@ const featuredPasta = ref([
 const benefits = ref([
   {
     icon: Dish,
-    title: 'Fresh Ingredients',
-    description: 'Made daily with the finest organic ingredients',
+    title: 'Taze Malzemeler',
+    description: 'Günlük olarak en iyi organik malzemelerle hazırlanır',
   },
   {
     icon: Clock,
-    title: 'Made to Order',
-    description: 'Prepared fresh when you place your order',
+    title: 'Sipariş Üzerine Hazırlanır',
+    description: 'Sipariş verdiğinizde taze hazırlanır',
   },
   {
     icon: Van,
-    title: 'Fast Delivery',
-    description: 'Delivered to your door within 24 hours',
+    title: 'Hızlı Teslimat',
+    description: '24 saat içinde kapınıza teslim edilir',
   },
   {
     icon: Star,
-    title: 'Top Quality',
-    description: 'Handcrafted with love and attention to detail',
+    title: 'Üstün Kalite',
+    description: 'Sevgiyle ve detaylara dikkat ederek el yapımı',
   },
 ])
 
@@ -70,7 +70,7 @@ const benefits = ref([
 const handleImageError = (event: Event) => {
   const target = event.target as HTMLImageElement
   if (target) {
-    target.src = 'https://placehold.co/300x180/ff6b6b/ffffff?text=Fresh+Pasta'
+    target.src = 'https://placehold.co/300x180/ff6b6b/ffffff?text=Taze+Makarna'
   }
 }
 
@@ -90,21 +90,23 @@ const goToProducts = () => {
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-content">
-        <h1 class="hero-title">Authentic Homemade Pasta</h1>
-        <p class="hero-subtitle">Crafted with passion, delivered with care</p>
+        <h1 class="hero-title">Orijinal Ev Yapımı Makarna</h1>
+        <p class="hero-subtitle">Tutkuyla hazırlanır, özenle teslim edilir</p>
         <div class="hero-buttons">
           <el-button type="primary" size="large" :icon="ShoppingBag" @click="goToProducts">
-            Shop Now
+            Şimdi Alışveriş Yap
           </el-button>
-          <el-button type="warning" size="large" plain @click="goToProducts"> View Menu </el-button>
+          <el-button type="warning" size="large" plain @click="goToProducts">
+            Menüyü Gör
+          </el-button>
         </div>
       </div>
     </section>
 
     <!-- Featured Products Carousel -->
     <section class="featured-section">
-      <h2 class="section-title">Featured Pasta Creations</h2>
-      <p class="section-subtitle">Our most popular handmade pasta dishes</p>
+      <h2 class="section-title">Öne Çıkan Makarna Yaratımları</h2>
+      <p class="section-subtitle">En popüler el yapımı makarna yemeklerimiz</p>
 
       <el-carousel :interval="4000" type="card" height="550px" class="products-carousel">
         <el-carousel-item v-for="pasta in featuredPasta" :key="pasta.id" class="carousel-item">
@@ -126,7 +128,7 @@ const goToProducts = () => {
                 </div>
               </div>
               <el-button type="primary" class="add-to-cart-btn" @click.stop>
-                Add to Cart
+                Sepete Ekle
               </el-button>
             </div>
           </el-card>
@@ -136,8 +138,8 @@ const goToProducts = () => {
 
     <!-- Benefits Section -->
     <section class="benefits-section">
-      <h2 class="section-title">Why Choose Our Pasta</h2>
-      <p class="section-subtitle">Experience the difference of homemade quality</p>
+      <h2 class="section-title">Neden Bizim Makarnamızı Seçmelisiniz</h2>
+      <p class="section-subtitle">Ev yapımı kalitenin farkını yaşayın</p>
 
       <el-row :gutter="30" class="benefits-grid">
         <el-col :span="6" v-for="(benefit, index) in benefits" :key="index" class="benefit-col">
@@ -155,10 +157,10 @@ const goToProducts = () => {
     <!-- Call to Action -->
     <section class="cta-section">
       <div class="cta-content">
-        <h2 class="cta-title">Ready to Taste the Difference?</h2>
-        <p class="cta-subtitle">Order now and get 10% off your first purchase</p>
+        <h2 class="cta-title">Farkı Tadına Hazır mısınız?</h2>
+        <p class="cta-subtitle">Şimdi sipariş verin ve ilk alışverişinizde %10 indirim kazanın</p>
         <el-button type="warning" size="large" :icon="ShoppingBag" @click="goToProducts">
-          Order Now
+          Sipariş Ver
         </el-button>
       </div>
     </section>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import {
   ElRow,
   ElCol,
@@ -10,10 +10,12 @@ import {
   ElSlider,
   ElInput,
   ElMessage,
+  ElLoading,
 } from 'element-plus'
 import { Star, ShoppingBag, Search } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
+import { productService } from '@/services/productService'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -30,106 +32,37 @@ interface Product {
   tags: string[]
 }
 
-const products = ref<Product[]>([
-  {
-    id: 1,
-    name: 'Fresh Fettuccine',
-    description: 'Handmade flat ribbon pasta, perfect with creamy sauces',
-    price: 12.99,
-    image: 'https://images.unsplash.com/photo-1515516484336-59005480b4d6?w=400&h=300&fit=crop',
-    rating: 4.9,
-    category: 'Fresh Pasta',
-    tags: ['vegetarian', 'egg'],
-  },
-  {
-    id: 2,
-    name: 'Artisanal Ravioli',
-    description: 'Delicate pasta pockets filled with ricotta and spinach',
-    price: 15.99,
-    image: 'https://images.unsplash.com/photo-1608496776497-46b4b1c1f5e3?w=400&h=300&fit=crop',
-    rating: 4.8,
-    category: 'Stuffed Pasta',
-    tags: ['vegetarian', 'ricotta'],
-  },
-  {
-    id: 3,
-    name: 'Homemade Pappardelle',
-    description: 'Wide egg pasta ribbons, ideal for rich meat sauces',
-    price: 14.99,
-    image: 'https://images.unsplash.com/photo-1616089080075-0f507671b1a4?w=400&h=300&fit=crop',
-    rating: 4.7,
-    category: 'Fresh Pasta',
-    tags: ['egg', 'meat'],
-  },
-  {
-    id: 4,
-    name: 'Traditional Tagliatelle',
-    description: 'Classic cut pasta, excellent with bolognese sauce',
-    price: 13.99,
-    image: 'https://images.unsplash.com/photo-1585951636944-300a6dae8644?w=400&h=300&fit=crop',
-    rating: 4.9,
-    category: 'Fresh Pasta',
-    tags: ['egg', 'meat'],
-  },
-  {
-    id: 5,
-    name: 'Spinach Fettuccine',
-    description: 'Fresh fettuccine with spinach infusion for a vibrant green color',
-    price: 13.49,
-    image: 'https://images.unsplash.com/photo-1515516484336-59005480b4d6?w=400&h=300&fit=crop',
-    rating: 4.6,
-    category: 'Fresh Pasta',
-    tags: ['vegetarian', 'egg', 'spinach'],
-  },
-  {
-    id: 6,
-    name: 'Mushroom Ravioli',
-    description: 'Ravioli filled with wild mushrooms and herbs',
-    price: 16.99,
-    image: 'https://images.unsplash.com/photo-1608496776497-46b4b1c1f5e3?w=400&h=300&fit=crop',
-    rating: 4.8,
-    category: 'Stuffed Pasta',
-    tags: ['vegetarian', 'mushroom'],
-  },
-  {
-    id: 7,
-    name: 'Gluten-Free Fusilli',
-    description: 'Spiral-shaped pasta made from rice and corn flour',
-    price: 11.99,
-    image: 'https://images.unsplash.com/photo-1616089080075-0f507671b1a4?w=400&h=300&fit=crop',
-    rating: 4.5,
-    category: 'Specialty Pasta',
-    tags: ['gluten-free', 'vegetarian'],
-  },
-  {
-    id: 8,
-    name: 'Seafood Linguine',
-    description: 'Flat pasta with seafood medley in white wine sauce',
-    price: 18.99,
-    image: 'https://images.unsplash.com/photo-1585951636944-300a6dae8644?w=400&h=300&fit=crop',
-    rating: 4.9,
-    category: 'Specialty Pasta',
-    tags: ['seafood'],
-  },
-])
+interface Category {
+  id: string
+  name: string
+  count: number
+}
+
+interface Tag {
+  id: string
+  name: string
+  count: number
+}
+
+const products = ref<Product[]>([])
+const loading = ref(false)
 
 // Filter options
-const categories = ref([
-  { id: 'fresh', name: 'Fresh Pasta', count: 3 },
-  { id: 'stuffed', name: 'Stuffed Pasta', count: 2 },
-  { id: 'specialty', name: 'Specialty Pasta', count: 2 },
-  { id: 'dried', name: 'Dried Pasta', count: 0 },
+const categories = ref<Category[]>([
+  { id: 'fresh', name: 'Taze Makarna', count: 0 },
+  { id: 'stuffed', name: 'Doldurulmuş Makarna', count: 0 },
+  { id: 'specialty', name: 'Özel Makarna', count: 0 },
+  { id: 'dried', name: 'Kurutulmuş Makarna', count: 0 },
 ])
-
-const tags = ref([
-  { id: 'vegetarian', name: 'Vegetarian', count: 4 },
-  { id: 'egg', name: 'Contains Egg', count: 3 },
-  { id: 'meat', name: 'Meat Dishes', count: 2 },
-  { id: 'gluten-free', name: 'Gluten-Free', count: 1 },
-  { id: 'seafood', name: 'Seafood', count: 1 },
-  { id: 'ricotta', name: 'Ricotta', count: 1 },
-  { id: 'mushroom', name: 'Mushroom', count: 1 },
-  { id: 'spinach', name: 'Spinach', count: 1 },
+const tags = ref<Tag[]>([
+  { id: 'vegetarian', name: 'Vejetaryen', count: 0 },
+  { id: 'egg', name: 'Yumurta İçerir', count: 0 },
+  { id: 'meat', name: 'Et Yemekleri', count: 0 },
+  { id: 'gluten-free', name: 'Glutensiz', count: 0 },
+  { id: 'seafood', name: 'Deniz Ürünleri', count: 0 },
+  { id: 'ricotta', name: 'Ricotta', count: 0 },
+  { id: 'mushroom', name: 'Mantar', count: 0 },
+  { id: 'spinach', name: 'Ispanak', count: 0 },
 ])
 
 // Filter state
@@ -137,12 +70,36 @@ const filters = reactive({
   search: '',
   categories: [] as string[],
   tags: [] as string[],
-  priceRange: [0, 25] as [number, number],
+  priceRange: [0, 50] as [number, number],
   rating: 0,
 })
 
 // Filtered products
-const filteredProducts = ref<Product[]>([...products.value])
+const filteredProducts = ref<Product[]>([])
+
+// Fetch products from API
+const fetchProducts = async () => {
+  loading.value = true
+  try {
+    const response = await productService.getProducts()
+    products.value = response.products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      image: product.image,
+      rating: 4.5, // Default rating, would come from API in real implementation
+      category: 'Taze Makarna', // Default category, would come from API
+      tags: [], // Default tags, would come from API
+    }))
+    filteredProducts.value = [...products.value]
+  } catch (error) {
+    console.error('Ürünler getirilemedi:', error)
+    ElMessage.error('Ürünler yüklenemedi. Lütfen daha sonra tekrar deneyin.')
+  } finally {
+    loading.value = false
+  }
+}
 
 // Toggle category filter
 const toggleCategory = (categoryId: string) => {
@@ -204,7 +161,7 @@ const resetAllFilters = () => {
   filters.search = ''
   filters.categories = []
   filters.tags = []
-  filters.priceRange = [0, 25]
+  filters.priceRange = [0, 50]
   filters.rating = 0
   filteredProducts.value = [...products.value]
 }
@@ -223,7 +180,7 @@ const goToProductDetail = (productId: number) => {
 // Add to cart function
 const addToCart = (product: Product) => {
   if (!userStore.isAuthenticated) {
-    ElMessage.warning('Please login to add items to cart')
+    ElMessage.warning('Sepete ürün eklemek için lütfen giriş yapın')
     router.push('/auth/login')
     return
   }
@@ -238,29 +195,26 @@ const addToCart = (product: Product) => {
     maxQuantity: 10, // Assuming a default max quantity
   })
 
-  ElMessage.success(`${product.name} added to cart!`)
+  ElMessage.success(`${product.name} sepete eklendi!`)
 }
-
-// Initialize with all products
-applyFilters()
 </script>
 
 <template>
   <div class="products-container">
-    <h1 class="page-title">Our Pasta Collection</h1>
+    <h1 class="page-title">Makarna Koleksiyonumuz</h1>
 
     <ElRow :gutter="30" class="products-layout">
       <!-- Filters Sidebar -->
       <ElCol :span="6" class="filters-sidebar">
         <div class="filters-container">
-          <h2 class="filters-title">Filters</h2>
+          <h2 class="filters-title">Filtreler</h2>
 
           <!-- Search Filter -->
           <div class="filter-section">
-            <h3>Search</h3>
+            <h3>Arama</h3>
             <ElInput
               v-model="filters.search"
-              placeholder="Search products..."
+              placeholder="Ürün ara..."
               :prefix-icon="Search"
               @input="applyFilters"
             />
@@ -268,7 +222,7 @@ applyFilters()
 
           <!-- Category Filter -->
           <div class="filter-section">
-            <h3>Categories</h3>
+            <h3>Kategoriler</h3>
             <div class="checkbox-group">
               <div v-for="category in categories" :key="category.id" class="checkbox-item">
                 <ElCheckbox
@@ -285,7 +239,7 @@ applyFilters()
 
           <!-- Tag Filter -->
           <div class="filter-section">
-            <h3>Dietary Preferences</h3>
+            <h3>Diyet Tercihleri</h3>
             <div class="checkbox-group">
               <div v-for="tag in tags" :key="tag.id" class="checkbox-item">
                 <ElCheckbox
@@ -302,7 +256,7 @@ applyFilters()
 
           <!-- Price Filter -->
           <div class="filter-section">
-            <h3>Price Range</h3>
+            <h3>Fiyat Aralığı</h3>
             <ElSlider
               v-model="filters.priceRange"
               range
@@ -318,7 +272,7 @@ applyFilters()
 
           <!-- Rating Filter -->
           <div class="filter-section">
-            <h3>Minimum Rating</h3>
+            <h3>Minimum Puan</h3>
             <div class="rating-filter">
               <ElButton
                 v-for="i in 5"
@@ -334,13 +288,15 @@ applyFilters()
               >
                 <ElIcon><Star /></ElIcon>
               </ElButton>
-              <ElButton type="default" @click="clearRating" plain> Clear </ElButton>
+              <ElButton type="default" @click="clearRating" plain> Temizle </ElButton>
             </div>
           </div>
 
           <!-- Reset Button -->
           <div class="filter-actions">
-            <ElButton @click="resetAllFilters" type="danger" plain> Reset All Filters </ElButton>
+            <ElButton @click="resetAllFilters" type="danger" plain>
+              Tüm Filtreleri Sıfırla
+            </ElButton>
           </div>
         </div>
       </ElCol>
@@ -349,7 +305,7 @@ applyFilters()
       <ElCol :span="18" class="products-grid">
         <div class="products-header">
           <div class="results-info">
-            Showing {{ filteredProducts.length }} of {{ products.length }} products
+            {{ products.length }} üründen {{ filteredProducts.length }} tanesi gösteriliyor
           </div>
         </div>
 
@@ -376,7 +332,7 @@ applyFilters()
                   </div>
                   <ElButton type="primary" class="add-to-cart-btn" @click.stop="addToCart(product)">
                     <ElIcon><ShoppingBag /></ElIcon>
-                    Add to Cart
+                    Sepete Ekle
                   </ElButton>
                 </div>
               </div>
@@ -386,9 +342,9 @@ applyFilters()
 
         <!-- Empty State -->
         <div v-if="filteredProducts.length === 0" class="empty-state">
-          <h3>No products found</h3>
-          <p>Try adjusting your filters to see more products</p>
-          <ElButton @click="resetAllFilters" type="primary">Reset Filters</ElButton>
+          <h3>Ürün bulunamadı</h3>
+          <p>Daha fazla ürün görmek için filtrelerinizi ayarlamayı deneyin</p>
+          <ElButton @click="resetAllFilters" type="primary">Filtreleri Sıfırla</ElButton>
         </div>
       </ElCol>
     </ElRow>

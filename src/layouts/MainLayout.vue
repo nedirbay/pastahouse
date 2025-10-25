@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { ElHeader, ElMain, ElFooter, ElContainer } from 'element-plus'
+import { Search, User, ShoppingCart } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/userStore'
 
 const userStore = useUserStore()
 
 // Cart item count (in a real app, this would come from a store)
-const cartItemCount = ref(6)
+const cartItemCount = computed(() => userStore.cartItemCount)
 </script>
 
 <template>
@@ -15,23 +16,25 @@ const cartItemCount = ref(6)
     <el-header class="app-header">
       <div class="header-content">
         <div class="logo">
-          <h1>PastaHouse</h1>
+          <RouterLink to="/" class="logo-link" style="text-decoration: none">
+            <h1>PastaHouse</h1>
+          </RouterLink>
         </div>
         <nav class="main-nav">
-          <RouterLink to="/" class="nav-link">Home</RouterLink>
-          <RouterLink to="/products" class="nav-link">Products</RouterLink>
-          <RouterLink to="/about" class="nav-link">About</RouterLink>
-          <RouterLink to="/contact" class="nav-link">Contact</RouterLink>
+          <RouterLink to="/" class="nav-link">Baş sahypa</RouterLink>
+          <RouterLink to="/products" class="nav-link">Kategoriýalar</RouterLink>
+          <RouterLink to="/about" class="nav-link">Biz barada</RouterLink>
+          <RouterLink to="/contact" class="nav-link">Habarlaşmak</RouterLink>
         </nav>
-        <div class="header-actions">
+        <div class="header-actions" style="margin-right: 60px">
           <button class="action-btn">
-            <i class="fas fa-search"></i>
+            <el-icon><Search /></el-icon>
           </button>
           <button class="action-btn">
-            <i class="fas fa-user"></i>
+            <el-icon><User /></el-icon>
           </button>
           <RouterLink to="/cart" class="action-btn cart-btn">
-            <i class="fas fa-shopping-cart"></i>
+            <el-icon><ShoppingCart /></el-icon>
             <span v-if="cartItemCount > 0" class="cart-count">{{ cartItemCount }}</span>
           </RouterLink>
         </div>
@@ -44,7 +47,7 @@ const cartItemCount = ref(6)
 
     <el-footer class="app-footer">
       <div class="footer-bottom">
-        <p>&copy; 2025 Router. All rights reserved.</p>
+        <p>&copy; 2025 Router. Tüm hakları saklıdır.</p>
       </div>
     </el-footer>
   </el-container>
@@ -56,19 +59,17 @@ const cartItemCount = ref(6)
   display: none;
 }
 
-/* Hide scrollbar for Firefox */
 * {
   scrollbar-width: none;
 }
 
 .app-container {
   min-height: 100vh;
-  width: 100%;
+  width: 100vw;
   margin: 0;
   padding: 0;
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .app-header {
@@ -120,14 +121,13 @@ const cartItemCount = ref(6)
 
 .header-actions {
   display: flex;
-  gap: 15px;
+  gap: 24px;
 }
 
 .action-btn {
   background: transparent;
   border: none;
   color: white;
-  font-size: 1.2rem;
   cursor: pointer;
   width: 40px;
   height: 40px;
@@ -139,6 +139,12 @@ const cartItemCount = ref(6)
   margin: 0;
   padding: 0;
   position: relative;
+}
+
+.action-btn :deep(.el-icon) {
+  font-size: 1.2rem;
+  width: 1em;
+  height: 1em;
 }
 
 .action-btn:hover {
@@ -177,6 +183,12 @@ const cartItemCount = ref(6)
   padding: 0;
   width: 100%;
   margin: 0;
+  position: relative;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .footer-bottom {

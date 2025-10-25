@@ -4,6 +4,7 @@ import { ElCard, ElForm, ElFormItem, ElInput, ElButton, ElIcon, ElMessage } from
 import { User, Lock, Message, ArrowRight } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
+import { authService } from '@/services/authService'
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -41,21 +42,33 @@ const handleRegister = async () => {
   loading.value = true
 
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // For demo purposes, we'll accept any valid input
-    // In a real app, you would validate with a backend API
-    userStore.register({
-      id: Date.now(),
+    // Use the actual authentication service to register
+    const response = await authService.register({
       name: registerForm.value.name,
       email: registerForm.value.email,
+      password: registerForm.value.password,
+    })
+
+    // Store the tokens
+    localStorage.setItem('token', response.tokens.access)
+    localStorage.setItem('refreshToken', response.tokens.refresh)
+
+    // Store user data in Pinia store
+    userStore.login({
+      id: response.id,
+      name: response.name,
+      email: response.email,
     })
 
     ElMessage.success('Registration successful!')
     router.push('/')
-  } catch (error) {
-    ElMessage.error('Registration failed. Please try again.')
+  } catch (error: any) {
+    console.error('Registration error:', error)
+    ElMessage.error(
+      error.response?.data?.message ||
+        error.response?.data?.detail ||
+        'Registration failed. Please try again.',
+    )
   } finally {
     loading.value = false
   }
@@ -132,73 +145,5 @@ const handleRegister = async () => {
 </template>
 
 <style scoped>
-.register-container {
-  width: 100%;
-  max-width: 450px;
-  padding: 20px;
-}
-
-.register-card {
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  border: none;
-}
-
-.card-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.card-header h2 {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.card-header p {
-  color: #666;
-  font-size: 1rem;
-}
-
-.register-form {
-  margin-bottom: 20px;
-}
-
-:deep(.el-input__wrapper) {
-  border-radius: 30px;
-  padding: 5px 20px;
-}
-
-.register-button {
-  width: 100%;
-  border-radius: 30px;
-  background: linear-gradient(135deg, #ff6b6b 0%, #ffa502 100%);
-  border: none;
-  font-weight: bold;
-  font-size: 1.1rem;
-  padding: 15px;
-}
-
-.register-icon {
-  margin-left: 10px;
-}
-
-.login-link {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.login-link p {
-  color: #666;
-}
-
-.login-link a {
-  color: #ff6b6b;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.login-link a:hover {
-  text-decoration: underline;
-}
+/* ... existing style code ... */
 </style>
