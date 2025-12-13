@@ -1,0 +1,236 @@
+# PastaHouse E-commerce Backend Models and API Endpoints
+
+## Data Models
+
+### 1. User Model
+- id: number (primary key)
+- name: string
+- email: string (unique)
+- password: string (hashed)
+- createdAt: Date
+- updatedAt: Date
+
+### 2. Product Model
+- id: number (primary key)
+- name: string
+- description: string
+- price: number (decimal)
+- image: string (URL)
+- rating: number (decimal, 0-5)
+- category: string
+- tags: string[] (array of tag names)
+- inStock: boolean
+- quantity: number
+- createdAt: Date
+- updatedAt: Date
+
+### 3. Category Model
+- id: number (primary key)
+- name: string
+- description: string
+- createdAt: Date
+- updatedAt: Date
+
+### 4. Tag Model
+- id: number (primary key)
+- name: string
+- description: string
+- createdAt: Date
+- updatedAt: Date
+
+### 5. CartItem Model
+- id: number (primary key)
+- userId: number (foreign key to User)
+- productId: number (foreign key to Product)
+- quantity: number
+- createdAt: Date
+- updatedAt: Date
+
+### 6. Order Model
+- id: number (primary key)
+- userId: number (foreign key to User)
+- name: string
+- email: string
+- phone: string
+- address: string
+- note: string
+- total: number (decimal)
+- status: string (pending, confirmed, shipped, delivered, cancelled)
+- createdAt: Date
+- updatedAt: Date
+
+### 7. OrderItem Model
+- id: number (primary key)
+- orderId: number (foreign key to Order)
+- productId: number (foreign key to Product)
+- name: string
+- price: number (decimal)
+- quantity: number
+- createdAt: Date
+- updatedAt: Date
+
+### 8. Review Model
+- id: number (primary key)
+- userId: number (foreign key to User)
+- productId: number (foreign key to Product)
+- rating: number (1-5)
+- comment: string
+- createdAt: Date
+- updatedAt: Date
+
+## API Endpoints
+
+### Authentication Endpoints
+- POST /api/auth/register
+  - Request: { name, email, password }
+  - Response: { user, token }
+
+- POST /api/auth/login
+  - Request: { email, password }
+  - Response: { user, token }
+
+- POST /api/auth/logout
+  - Request: { token }
+  - Response: { message: "Logged out successfully" }
+
+### User Endpoints
+- GET /api/users/profile
+  - Headers: Authorization: Bearer <token>
+  - Response: User object
+
+- PUT /api/users/profile
+  - Headers: Authorization: Bearer <token>
+  - Request: { name, email }
+  - Response: Updated User object
+
+- GET /api/users/orders
+  - Headers: Authorization: Bearer <token>
+  - Response: Array of Order objects
+
+### Product Endpoints
+- GET /api/products
+  - Query Parameters: page, limit, search, category, tags, minPrice, maxPrice, minRating
+  - Response: { products: Product[], pagination: { page, limit, total } }
+
+- GET /api/products/:id
+  - Response: Product object
+
+- POST /api/products (Admin only)
+  - Headers: Authorization: Bearer <token>
+  - Request: Product data
+  - Response: Created Product object
+
+- PUT /api/products/:id (Admin only)
+  - Headers: Authorization: Bearer <token>
+  - Request: Product data
+  - Response: Updated Product object
+
+- DELETE /api/products/:id (Admin only)
+  - Headers: Authorization: Bearer <token>
+  - Response: { message: "Product deleted successfully" }
+
+### Category Endpoints
+- GET /api/categories
+  - Response: Array of Category objects
+
+- POST /api/categories (Admin only)
+  - Headers: Authorization: Bearer <token>
+  - Request: { name, description }
+  - Response: Created Category object
+
+### Tag Endpoints
+- GET /api/tags
+  - Response: Array of Tag objects
+
+### Cart Endpoints
+- GET /api/cart
+  - Headers: Authorization: Bearer <token>
+  - Response: Array of CartItem objects
+
+- POST /api/cart
+  - Headers: Authorization: Bearer <token>
+  - Request: { productId, quantity }
+  - Response: Added CartItem object
+
+- PUT /api/cart/:id
+  - Headers: Authorization: Bearer <token>
+  - Request: { quantity }
+  - Response: Updated CartItem object
+
+- DELETE /api/cart/:id
+  - Headers: Authorization: Bearer <token>
+  - Response: { message: "Item removed from cart" }
+
+- DELETE /api/cart
+  - Headers: Authorization: Bearer <token>
+  - Response: { message: "Cart cleared" }
+
+### Order Endpoints
+- GET /api/orders
+  - Headers: Authorization: Bearer <token>
+  - Query Parameters: status
+  - Response: Array of Order objects
+
+- GET /api/orders/:id
+  - Headers: Authorization: Bearer <token>
+  - Response: Order object with OrderItems
+
+- POST /api/orders
+  - Headers: Authorization: Bearer <token>
+  - Request: { name, email, phone, address, note, items: [{ productId, quantity }] }
+  - Response: Created Order object
+
+- PUT /api/orders/:id/cancel
+  - Headers: Authorization: Bearer <token>
+  - Response: Updated Order object
+
+### Review Endpoints
+- GET /api/products/:id/reviews
+  - Query Parameters: page, limit
+  - Response: { reviews: Review[], pagination: { page, limit, total } }
+
+- POST /api/products/:id/reviews
+  - Headers: Authorization: Bearer <token>
+  - Request: { rating, comment }
+  - Response: Created Review object
+
+- PUT /api/reviews/:id
+  - Headers: Authorization: Bearer <token>
+  - Request: { rating, comment }
+  - Response: Updated Review object
+
+- DELETE /api/reviews/:id
+  - Headers: Authorization: Bearer <token>
+  - Response: { message: "Review deleted" }
+
+## Additional Considerations
+
+### Search and Filtering
+- Full-text search on product names and descriptions
+- Filtering by category, tags, price range, and rating
+
+### Pagination
+- All list endpoints should support pagination with page and limit parameters
+
+### Authentication
+- JWT-based authentication
+- Token refresh mechanism
+- Password reset functionality
+
+### Security
+- Password hashing (bcrypt)
+- Input validation and sanitization
+- Rate limiting for authentication endpoints
+- CORS configuration
+
+### Performance
+- Database indexing on frequently queried fields
+- Caching for product listings
+- Image optimization for product images
+
+### Admin Features
+- User management
+- Product management
+- Order management
+- Category and tag management
+- Review moderation
